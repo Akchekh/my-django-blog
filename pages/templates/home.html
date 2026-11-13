@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}الرئيسية - مدونتي{% endblock %}
+
+{% block content %}
+    <div class="text-center mb-5 mt-3">
+        <h1 class="fw-bold text-success">أحدث المقالات 📝</h1>
+        {% if query %}
+            <p class="text-muted">نتائج البحث عن: <strong>"{{ query }}"</strong></p>
+        {% else %}
+            <p class="text-muted">مرحباً بك في أول موقع ويب متكامل</p>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        {% for article in page_obj %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm article-card">
+                    {% if article.image %}
+                        <img src="{{ article.image.url }}" class="card-img-top" style="height: 250px; object-fit: cover;" alt="{{ article.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">{{ article.title }}</h5>
+                        <p class="card-text text-muted">{{ article.content|truncatewords:15 }}</p>
+                    </div>
+                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted">{{ article.created_at|date:"Y-m-d" }}</small>
+                            {% if article.category %}
+                                <br><span class="badge bg-secondary mt-1">{{ article.category.name }}</span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'article_detail' article.pk %}" class="btn btn-sm btn-outline-success">اقرأ المزيد</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center">
+                <p class="alert alert-info">لا توجد مقالات تطابق بحثك أو لم تُضف مقالات بعد.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- أزرار الترقيم -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link text-success" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">السابق</a></li>
+            {% endif %}
+
+            <li class="page-item disabled"><span class="page-link">صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}</span></li>
+
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link text-success" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">التالي</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+{% endblock %}

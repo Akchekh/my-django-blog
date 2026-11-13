@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}لوحة التحكم{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-success">إدارة المقالات 📊</h2>
+    <a href="{% url 'add_article' %}" class="btn btn-success">+ إضافة مقالة جديدة</a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0 text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>العنوان</th>
+                    <th>التصنيف</th>
+                    <th>تاريخ النشر</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                <tr>
+                    <td>{{ article.title }}</td>
+                    <td>
+                        {% if article.category %}
+                            <span class="badge bg-secondary">{{ article.category.name }}</span>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ article.created_at|date:"Y-m-d" }}</td>
+                    <td>
+                        <a href="{% url 'article_detail' article.pk %}" class="btn btn-sm btn-info text-white">عرض</a>
+                        
+                        <!-- نموذج الحذف -->
+                        <form action="{% url 'delete_article' article.pk %}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه المقالة؟');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger">حذف</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-muted py-4">لا توجد مقالات حالياً. ابدأ بإضافة مقالة!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

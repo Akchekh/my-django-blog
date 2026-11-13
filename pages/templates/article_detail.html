@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-5">
+                    <h1 class="fw-bold mb-3 text-success">{{ article.title }}</h1>
+                    
+                    <p class="text-muted border-bottom pb-3">
+                        تاريخ النشر: {{ article.created_at|date:"Y-m-d H:i" }}
+                        {% if article.category %}
+                            | التصنيف: <span class="badge bg-secondary">{{ article.category.name }}</span>
+                        {% endif %}
+                    </p>
+                    
+                    {% if article.image %}
+                        <img src="{{ article.image.url }}" class="img-fluid rounded mb-4 shadow-sm" alt="{{ article.title }}">
+                    {% endif %}
+                    
+                    <div class="fs-5 lh-lg">
+                        {{ article.content }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h4 class="mb-4">التعليقات ({{ article.comments.count }})</h4>
+                    
+                    {% for comment in article.comments.all %}
+                        <div class="border-bottom mb-3 pb-2">
+                            <strong>{{ comment.name }}</strong> <small class="text-muted">{{ comment.created_at|date:"Y-m-d" }}</small>
+                            <p class="mb-0">{{ comment.body }}</p>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted">لا توجد تعليقات بعد. كن أول من يعلق!</p>
+                    {% endfor %}
+
+                    <hr>
+                    {% if user.is_authenticated %}
+                        <h5 class="mt-4">أضف تعليقاً:</h5>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <textarea name="body" class="form-control" rows="3" placeholder="اكتب تعليقك هنا..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success">إرسال التعليق</button>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-info mt-4">
+                            يجب عليك <a href="{% url 'login' %}" class="alert-link">تسجيل الدخول</a> لتتمكن من كتابة تعليق.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{% url 'home' %}" class="btn btn-outline-success">← العودة للصفحة الرئيسية</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
